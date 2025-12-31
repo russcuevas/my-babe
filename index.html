@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy New Year!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --rose-gold: #ffb3a7;
+            --deep-gold: #FF9800;
+        }
+
+        body {
+            background-color: #050505;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .cursive {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .parallax-layer {
+            transition: transform 0.1s ease-out;
+            z-index: 10;
+        }
+
+        #fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, var(--rose-gold), var(--deep-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .heart-icon {
+            color: #ff4d4d;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* 3D Flip Card Logic */
+        .memory-card-container {
+            perspective: 1000px;
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+        }
+
+        .memory-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+
+        /* This class is added by JavaScript on click */
+        .memory-card-container.is-flipped .memory-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card-front,
+        .memory-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .memory-card-back {
+            transform: rotateY(180deg);
+        }
+
+        .floating-heart {
+            position: fixed;
+            font-size: 20px;
+            user-select: none;
+            pointer-events: none;
+            z-index: 1;
+            animation: floatUp 8s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 0.6;
+            }
+
+            80% {
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translateY(-10vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+
+        @keyframes celebrate {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Custom Cursor Styles */
+        .cursor-dot,
+        .cursor-outline {
+            pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            transition: opacity 0.3s ease-in-out, transform 0.1s ease-in-out;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--rose-gold);
+        }
+
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--deep-gold);
+            transition: all 0.15s ease-out;
+        }
+
+        /* Sparkle effect on click */
+        .cursor-click-anim {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            animation: click-ripple 0.6s ease-out forwards;
+            border: 2px solid var(--rose-gold);
+            border-radius: 50%;
+        }
+
+        @keyframes click-ripple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+
+            100% {
+                width: 100px;
+                height: 100px;
+                opacity: 0;
+            }
+        }
+
+        /* Hide real cursor on desktop for better effect */
+        @media (min-width: 768px) {
+            body {
+                cursor: none;
+            }
+
+            a,
+            button,
+            .memory-card-container,
+            .group {
+                cursor: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cursor-dot" data-cursor-dot></div>
+    <div class="cursor-outline" data-cursor-outline></div>
+    <div id="fireworks-canvas"></div>
+
+    <section class="relative h-screen flex flex-col items-center justify-center overflow-hidden">
+        <div class="parallax-layer absolute inset-0 opacity-20" data-speed="2">
+            <div class="absolute top-20 left-1/4 text-2xl">✨</div>
+            <div class="absolute bottom-1/3 right-1/4 text-xl">🌸</div>
+            <div class="absolute top-1/2 left-10 text-xl">💖</div>
+        </div>
+
+        <div class="parallax-layer z-20 text-center px-4" data-speed="-3">
+            <p class="text-rose-300 uppercase tracking-[0.3em] mb-4 text-sm font-bold animate-pulse"
+                data-aos="fade-down">
+                To my dearest
+            </p>
+            <h1 class="text-6xl md:text-8xl font-bold mb-2" data-aos="zoom-in">
+                Yssabelle <span class="text-gradient">Endozo</span>
+            </h1>
+            <h2 class="text-4xl md:text-6xl cursive text-white mb-8" data-aos="zoom-in" data-aos-delay="200">
+                Happy New Year 2026
+            </h2>
+
+            <div class="flex gap-4 justify-center mt-6 bg-white/5 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-2xl"
+                data-aos="fade-up" data-aos-delay="400">
+                <div class="text-center">
+                    <span id="days" class="block text-3xl font-bold text-gradient">00</span>
+                    <span class="text-[10px] uppercase text-gray-400">Days</span>
+                </div>
+                <div class="text-2xl text-white/20">:</div>
+                <div class="text-center">
+                    <span id="hours" class="block text-3xl font-bold text-gradient">00</span>
+                    <span class="text-[10px] uppercase text-gray-400">Hrs</span>
+                </div>
+                <div class="text-2xl text-white/20">:</div>
+                <div class="text-center">
+                    <span id="minutes" class="block text-3xl font-bold text-gradient">00</span>
+                    <span class="text-[10px] uppercase text-gray-400">Min</span>
+                </div>
+                <div class="text-2xl text-white/20">:</div>
+                <div class="text-center">
+                    <span id="seconds" class="block text-3xl font-bold text-gradient">00</span>
+                    <span class="text-[10px] uppercase text-gray-400">Sec</span>
+                </div>
+            </div>
+
+            <div class="heart-icon text-4xl mt-10">❤️</div>
+        </div>
+    </section>
+
+    <section class="relative py-20 px-6 z-10">
+        <div class="max-w-lg mx-auto">
+            <div class="bg-white/5 backdrop-blur-2xl border border-white/10 p-10 rounded-[2rem] shadow-2xl transform hover:scale-[1.02] transition-all duration-500 cursor-pointer group"
+                onclick="document.getElementById('letter-content').classList.toggle('max-h-96')">
+                <div class="text-center">
+                    <div class="relative inline-block mb-6">
+                        <span class="text-6xl block group-hover:rotate-12 transition-transform duration-300">✉️</span>
+                        <div class="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full animate-ping"></div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2 cursive text-gradient">A Special Note for 2026</h3>
+                    <p class="text-xs text-gray-500 mb-4 tracking-widest">TAP TO UNFOLD</p>
+
+                    <div id="letter-content" class="max-h-0 overflow-hidden transition-all duration-1000 ease-in-out">
+                        <div class="border-t border-white/10 pt-6 mt-4 italic text-rose-100 leading-relaxed">
+                            "Baby, as we step into another year, my only wish is to keep making you smile.
+                            Thank you for being the most wonderful part of my life. Every day with you is a
+                            celebration, and I can't wait to create more magic with you in 2026.
+                            You are my today and all of my tomorrows."
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 z-20 relative overflow-hidden">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl font-bold text-gradient mb-4">Ikaw ang pinakamaganda sa lahat</h2>
+                <div class="w-24 h-1 bg-gradient-to-right from-rose-400 to-orange-400 mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+                <div class="memory-card-container" onclick="toggleFlip(this)" data-aos="zoom-in">
+                    <div class="memory-card-inner">
+                        <div
+                            class="memory-card-front flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl shadow-xl">
+                            <span class="cursive text-6xl text-gradient opacity-80">Y</span>
+                        </div>
+                        <div class="memory-card-back rounded-3xl overflow-hidden border-2 border-rose-300">
+                            <img src="1.jpg" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                <div class="memory-card-container" onclick="toggleFlip(this)" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="memory-card-inner">
+                        <div
+                            class="memory-card-front flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl shadow-xl">
+                            <span class="cursive text-6xl text-gradient opacity-80">S</span>
+                        </div>
+                        <div class="memory-card-back rounded-3xl overflow-hidden border-2 border-rose-300">
+                            <img src="3.jpg" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                <div class="memory-card-container" onclick="toggleFlip(this)" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="memory-card-inner">
+                        <div
+                            class="memory-card-front flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl shadow-xl">
+                            <span class="cursive text-6xl text-gradient opacity-80">S</span>
+                        </div>
+                        <div class="memory-card-back rounded-3xl overflow-hidden border-2 border-rose-300">
+                            <img src="2.jpg" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                <div class="memory-card-container" onclick="toggleFlip(this)" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="memory-card-inner">
+                        <div
+                            class="memory-card-front flex items-center justify-center bg-white/5 border border-white/10 rounded-3xl shadow-xl">
+                            <span class="cursive text-6xl text-gradient opacity-80">A</span>
+                        </div>
+                        <div class="memory-card-back rounded-3xl overflow-hidden border-2 border-rose-300">
+                            <img src="4.jpg" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="relative pt-32 pb-10 text-center border-t border-white/5 bg-black/40 backdrop-blur-md">
+        <p class="cursive text-4xl text-gradient mb-2">Always Yours,</p>
+        <p class="text-gray-500 text-[10px] tracking-[0.4em] uppercase mt-4">For Yssabelle Endozo Sordan</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.x/dist/index.umd.js"></script>
+
+    <script>
+        AOS.init({ duration: 1200, once: true });
+
+        function updateCountdown() {
+            const targetDate = new Date("January 1, 2026 00:00:00").getTime();
+            const now = new Date().getTime();
+            const gap = targetDate - now;
+            const timerBox = document.querySelector('.flex.gap-4.justify-center');
+
+            if (gap <= 0) {
+                timerBox.innerHTML = `
+            <div class="text-center py-4 px-8" data-aos="zoom-in">
+                <h2 class="text-3xl md:text-5xl font-bold text-gradient cursive leading-tight">
+                    HAPPY NEW YEAR!<br>MAHAL NA MAHAL KITA!
+                </h2>
+                <div class="mt-4 text-2xl animate-bounce">🎆💖🎆</div>
+            </div>
+        `;
+
+                // Boost fireworks intensity for the celebration
+                fireworks.updateOptions({
+                    intensity: 50,
+                    particles: 150,
+                    explosion: 10
+                });
+
+                return; // Stop the rest of the function
+            }
+
+            // Normal countdown math
+            const second = 1000;
+            const minute = second * 60;
+            const hour = minute * 60;
+            const day = hour * 24;
+
+            document.getElementById('days').innerText = Math.floor(gap / day);
+            document.getElementById('hours').innerText = Math.floor((gap % day) / hour);
+            document.getElementById('minutes').innerText = Math.floor((gap % hour) / minute);
+            document.getElementById('seconds').innerText = Math.floor((gap % minute) / second);
+        }
+
+        // Run it every second
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Fireworks
+        const container = document.getElementById('fireworks-canvas');
+        const fireworks = new Fireworks.default(container, {
+            autoresize: true,
+            opacity: 0.3,
+            acceleration: 1.02,
+            friction: 0.97,
+            gravity: 1.5,
+            particles: 50,
+            traceLength: 3,
+            explosion: 5,
+            intensity: 15,
+            hue: { min: 0, max: 50 },
+            delay: { min: 30, max: 60 },
+            brightness: { min: 50, max: 80 },
+            decay: { min: 0.015, max: 0.03 }
+        });
+        fireworks.start();
+
+        // Parallax
+        document.addEventListener("mousemove", (e) => {
+            const layers = document.querySelectorAll(".parallax-layer");
+            const x = (window.innerWidth - e.pageX * 2) / 100;
+            const y = (window.innerHeight - e.pageY * 2) / 100;
+            layers.forEach(layer => {
+                const speed = layer.getAttribute('data-speed');
+                layer.style.transform = `translateX(${x * speed}px) translateY(${y * speed}px)`;
+            });
+        });
+
+        function toggleFlip(card) {
+            card.classList.toggle('is-flipped');
+        }
+
+        // Floating Hearts
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('floating-heart');
+            heart.innerHTML = ['❤️', '🌸', '✨', '💖'][Math.floor(Math.random() * 4)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 3 + 5) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 8000);
+        }
+        setInterval(createHeart, 2000);
+        const cursorDot = document.querySelector("[data-cursor-dot]");
+        const cursorOutline = document.querySelector("[data-cursor-outline]");
+
+        window.addEventListener("mousemove", function (e) {
+            const posX = e.clientX;
+            const posY = e.clientY;
+
+            // Standard positioning
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+
+            // Outline follows with a slight delay (smooth lag effect)
+            cursorOutline.animate({
+                left: `${posX}px`,
+                top: `${posY}px`
+            }, { duration: 500, fill: "forwards" });
+        });
+
+        // Click effect
+        window.addEventListener("click", function (e) {
+            const ripple = document.createElement("div");
+            ripple.className = "cursor-click-anim";
+            ripple.style.left = `${e.clientX}px`;
+            ripple.style.top = `${e.clientY}px`;
+            ripple.style.transform = `translate(-50%, -50%)`;
+            document.body.appendChild(ripple);
+
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+
+        // Hover effect (make cursor bigger when hovering over cards or the letter)
+        const interactiveElements = document.querySelectorAll('button, a, .memory-card-container, .group');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorOutline.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                cursorOutline.style.backgroundColor = 'rgba(255, 179, 167, 0.1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorOutline.style.transform = 'translate(-50%, -50%) scale(1)';
+                cursorOutline.style.backgroundColor = 'transparent';
+            });
+        });
+    </script>
+</body>
+
+</html>
